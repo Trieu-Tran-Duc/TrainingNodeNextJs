@@ -13,15 +13,17 @@ const BarcodeScanner = dynamic(
     { ssr: false }
 );
 
-
 export default function ScanPage() {
     const [status, setStatus] = useState<string>("");
     const [scannedQRCodes, setScannedQRCodes] = useState<QRData[]>([]);
     const [isClient, setIsClient] = useState(false);
+    const [scanning, setScanning] = useState(false);
+
     const online = useNetworkStatus();
     useOfflineSync();
 
     const sendToServer = async (qr: QRData) => {
+
         try {
             const res = await fetch("http://localhost:3001/api/scans", {
                 method: "POST",
@@ -44,6 +46,10 @@ export default function ScanPage() {
             }
         } catch (err) {
             console.log("Offline, will retry later", err);
+
+            const code = await addQRCode(qr.code);
+            setScannedQRCodes((prev) => [...prev, code]);
+
             setStatus(`Failed to send QR code: ${qr.code}, saved offline`);
         }
     };
@@ -85,12 +91,15 @@ export default function ScanPage() {
 
         return null;
     };
-
+    const handleStartScan = () => {
+        setScanning((prev) => !prev);
+    };
     if (!isClient) return null;
 
     return (
         <div style={{ padding: "1rem" }}>
-            <h1>QR Code Scan Page</h1>
+            <button onClick={handleStartScan}>{scanning ? "Kết thúc scan" : "Bắt đầu scan"}</button>
+
             <p>Status: {status}</p>
             <p>
                 Network status:{" "}
@@ -98,27 +107,27 @@ export default function ScanPage() {
                     {online ? "Online" : "Offline"}
                 </strong>
             </p>
-
-            <div style={{ margin: "1rem 0", width: "300px" }}>
-                <BarcodeScanner
-                    onUpdate={(err, result) => {
-                        if (err) {
-                            return;
-                        }
-                        if (result) {
-                            var qrText = extractTextFromResult(result)
-                            if (qrText) {
-                                handleScan(qrText);
+            {scanning && (
+                <div style={{ margin: "1rem 0", width: "300px" }}>
+                    <BarcodeScanner
+                        onUpdate={(err, result) => {
+                            if (err) {
+                                return;
                             }
-                        }
-                    }}
-                    onError={(err) => console.error(err)}
-                    videoConstraints={{ facingMode: "environment" }}
-                    width={800}
-                    height={800}
-                />
-            </div>
-
+                            if (result) {
+                                var qrText = extractTextFromResult(result)
+                                if (qrText) {
+                                    handleScan(qrText);
+                                }
+                            }
+                        }}
+                        onError={(err) => console.error(err)}
+                        videoConstraints={{ facingMode: "environment" }}
+                        width={800}
+                        height={800}
+                    />
+                </div>
+            )}
             <h2>Scanned QR Codes:</h2>
             <ul>
                 {scannedQRCodes.map((qr, idx) => (
