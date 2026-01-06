@@ -1,6 +1,8 @@
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import { addQRCode, getPendingQRCodes, markAsSent, QRData } from "@/lib/indexedDB";
+import { useNetworkStatus } from "@/lib/useNetworkStatus";
+import { useOfflineSync } from "@/lib/useOfflineSync";
 
 // Load QR scanner only on client
 const QrReader = dynamic(
@@ -10,12 +12,12 @@ const QrReader = dynamic(
 
 export default function ScanPage() {
     const [status, setStatus] = useState<string>("");
-    const [online, setOnline] = useState<boolean>(navigator.onLine);
     const [scannedQRCodes, setScannedQRCodes] = useState<QRData[]>([]);
     const [isClient, setIsClient] = useState(false);
+    const online = useNetworkStatus();
+    useOfflineSync();
 
     const sendToServer = async (qr: QRData) => {
-        console.log("sento server")
         try {
             const res = await fetch("http://localhost:3001/api/scans", {
                 method: "POST",
@@ -45,67 +47,64 @@ export default function ScanPage() {
     const handleScan = async (data: string | null) => {
         if (!data) return;
         setStatus(`Scanned: ${data}`);
+
         const qr = await addQRCode(data);
         setScannedQRCodes((prev) => [...prev, qr]);
 
-        if (navigator.onLine) {
+        if (online) {
             await sendToServer(qr);
+        } else {
+            setStatus(`Offline, QR code saved locally`);
         }
     };
 
     const syncPending = async () => {
-        if (!navigator.onLine) return;
+        if (!online) return;
         const pending = await getPendingQRCodes();
 
         for (const qr of pending) {
             if (!qr.completed) await sendToServer(qr);
         }
     };
-
+    
     useEffect(() => {
         setIsClient(true);
+        syncPending();
+    }, [online]);
 
-        // const handleOnline = async () => {
-        //     setOnline(true);
-        //     setStatus("Back online! Syncing pending QR codes...");
-        //     await syncPending();
-        // };
+    // useEffect(() => {
+    //     setIsClient(true);
 
-        // const handleOffline = () => {
-        //     setOnline(false)
-        //     setStatus("Back offline");
-        // };
 
-        const checkInternet = async () => {
-            try {
-                await fetch("http://localhost:3001/api/scans",
-                    {
-                        cache: "no-store",
-                        method: "GET",
-                    });
-                setOnline(true);
-                setStatus("Back online! Syncing pending QR codes...");
-                await syncPending();
-            } catch {
-                setOnline(false);
-                setStatus("Offline");
-            }
-        };
+    //     const checkInternet = async () => {
+    //         try {
+    //             await fetch("http://localhost:3001/api/scans",
+    //                 {
+    //                     cache: "no-store",
+    //                     method: "GET",
+    //                 });
+    //             setStatus("Back online! Syncing pending QR codes...");
+    //             await syncPending();
+    //         } catch {
+    //             registerSync()
+    //             setStatus("Offline");
+    //         }
+    //     };
 
-        window.addEventListener("online", checkInternet);
-        window.addEventListener("offline", () => {
-            setOnline(false);
-            setStatus("Offline");
-        });
+    //     window.addEventListener("online", checkInternet);
+    //     window.addEventListener("offline", () => {
+    //         setStatus("Offline");
+    //         registerSync()
+    //     });
 
-        checkInternet();
+    //     checkInternet();
 
-        return () => {
-            window.removeEventListener("online", checkInternet);
-            window.removeEventListener("offline", checkInternet);
-        };
+    //     return () => {
+    //         window.removeEventListener("online", checkInternet);
+    //         window.removeEventListener("offline", checkInternet);
+    //     };
 
-    }, []);
+    // }, []);
 
     if (!isClient) return null;
 

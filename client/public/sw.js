@@ -1,14 +1,15 @@
-self.addEventListener("install", (event) => {
-  console.log("SW installing...");
+self.addEventListener('install', event => {
+  console.log('[SW] Installed');
+  self.skipWaiting();
 });
 
-self.addEventListener("activate", (event) => {
-  console.log("SW activating...");
+self.addEventListener('activate', event => {
+  console.log('[SW] Activated');
+  self.clients.claim();
 });
 
-// Intercept fetch requests and log URLs (scan example)
-self.addEventListener("fetch", (event) => {
-  console.log("SW fetch:", event.request.url);
-  // fallback to network
-  event.respondWith(fetch(event.request));
+self.addEventListener('sync', event => {
+  if (event.tag === 'sync-qr') {
+    event.waitUntil(syncPendingQR());
+  }
 });

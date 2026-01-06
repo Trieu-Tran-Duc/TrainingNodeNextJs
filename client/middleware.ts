@@ -8,7 +8,7 @@ export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   if (
-    pathname.startsWith("/login") ||
+    pathname.startsWith("/scan") ||
     pathname.startsWith("/_next")
   ) {
     return NextResponse.next();
@@ -17,7 +17,7 @@ export async function middleware(req: NextRequest) {
   const token = req.cookies.get("token")?.value;
 
   if (!token) {
-    return NextResponse.redirect(new URL("/login", req.url));
+    return NextResponse.redirect(new URL("/scan", req.url));
   }
 
   try {
@@ -33,7 +33,7 @@ export async function middleware(req: NextRequest) {
 
     return NextResponse.next();
   } catch (err) {
-    return NextResponse.redirect(new URL("/login", req.url));
+    return NextResponse.redirect(new URL("/scan", req.url));
   }
 }
 
