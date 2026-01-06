@@ -3,12 +3,13 @@ import type { NextRequest } from "next/server";
 import jwt from "jsonwebtoken";
 
 const SECRET_KEY = process.env.JWT_SECRET as string;
+const DEFAULT_URL = '/scan'
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   if (
-    pathname.startsWith("/scan") ||
+    pathname.startsWith(DEFAULT_URL) ||
     pathname.startsWith("/_next")
   ) {
     return NextResponse.next();
@@ -17,7 +18,7 @@ export async function middleware(req: NextRequest) {
   const token = req.cookies.get("token")?.value;
 
   if (!token) {
-    return NextResponse.redirect(new URL("/scan", req.url));
+    return NextResponse.redirect(new URL(DEFAULT_URL, req.url));
   }
 
   try {
@@ -33,7 +34,7 @@ export async function middleware(req: NextRequest) {
 
     return NextResponse.next();
   } catch (err) {
-    return NextResponse.redirect(new URL("/scan", req.url));
+    return NextResponse.redirect(new URL(DEFAULT_URL, req.url));
   }
 }
 

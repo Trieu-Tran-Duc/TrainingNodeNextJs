@@ -1,4 +1,4 @@
-import { parse } from "cookie";
+import { parse, serialize } from "cookie";
 import jwt from "jsonwebtoken";
 
 const SECRET_KEY = process.env.JWT_SECRET as string;
@@ -23,4 +23,14 @@ export function getTokenFromRequest(cookieHeader?: string): DecodedToken | null 
   } catch (err) {
     return null;
   }
+}
+
+export function setTokenCookie(res: any, token: string) {
+  const cookieStr = serialize("token", token, {
+    httpOnly: true,
+    sameSite: "lax",
+    path: "/",
+    maxAge: 60 * 60 * 24,
+  });
+  res.setHeader("Set-Cookie", cookieStr);
 }

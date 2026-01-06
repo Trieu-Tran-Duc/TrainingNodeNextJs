@@ -4,11 +4,15 @@ import { addQRCode, getPendingQRCodes, markAsSent, QRData } from "@/lib/indexedD
 import { useNetworkStatus } from "@/lib/useNetworkStatus";
 import { useOfflineSync } from "@/lib/useOfflineSync";
 
-// Load QR scanner only on client
-const QrReader = dynamic(
-    () => import('react-qr-reader').then((mod) => mod.QrReader),
+// const QrReader = dynamic(() => import("react-qr-reader").then(mod => mod.QrReader), {
+//     ssr: false,
+// });
+
+const BarcodeScanner = dynamic(
+    () => import("react-qr-barcode-scanner"),
     { ssr: false }
 );
+
 
 export default function ScanPage() {
     const [status, setStatus] = useState<string>("");
@@ -66,45 +70,21 @@ export default function ScanPage() {
             if (!qr.completed) await sendToServer(qr);
         }
     };
-    
+
     useEffect(() => {
         setIsClient(true);
         syncPending();
     }, [online]);
 
-    // useEffect(() => {
-    //     setIsClient(true);
+    const extractTextFromResult = (result: any): string | null => {
+        if (!result) return null;
 
+        if (typeof result === "string") return result;
+        if (typeof result.text === "string") return result.text;
+        if (typeof result.getText === "function") return result.getText();
 
-    //     const checkInternet = async () => {
-    //         try {
-    //             await fetch("http://localhost:3001/api/scans",
-    //                 {
-    //                     cache: "no-store",
-    //                     method: "GET",
-    //                 });
-    //             setStatus("Back online! Syncing pending QR codes...");
-    //             await syncPending();
-    //         } catch {
-    //             registerSync()
-    //             setStatus("Offline");
-    //         }
-    //     };
-
-    //     window.addEventListener("online", checkInternet);
-    //     window.addEventListener("offline", () => {
-    //         setStatus("Offline");
-    //         registerSync()
-    //     });
-
-    //     checkInternet();
-
-    //     return () => {
-    //         window.removeEventListener("online", checkInternet);
-    //         window.removeEventListener("offline", checkInternet);
-    //     };
-
-    // }, []);
+        return null;
+    };
 
     if (!isClient) return null;
 
@@ -120,11 +100,22 @@ export default function ScanPage() {
             </p>
 
             <div style={{ margin: "1rem 0", width: "300px" }}>
-                <QrReader
-                    onResult={(result) => {
-                        if (result) handleScan(result.getText());
+                <BarcodeScanner
+                    onUpdate={(err, result) => {
+                        if (err) {
+                            return;
+                        }
+                        if (result) {
+                            var qrText = extractTextFromResult(result)
+                            if (qrText) {
+                                handleScan(qrText);
+                            }
+                        }
                     }}
-                    constraints={{ facingMode: "environment" }}
+                    onError={(err) => console.error(err)}
+                    videoConstraints={{ facingMode: "environment" }}
+                    width={800}
+                    height={800}
                 />
             </div>
 
