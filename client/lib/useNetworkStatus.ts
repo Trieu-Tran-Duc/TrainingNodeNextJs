@@ -7,19 +7,6 @@ export function useNetworkStatus() {
         const updateOnline = () => setOnline(true);
         const updateOffline = () => setOnline(false);
 
-        // const checkInternet = async () => {
-        //     try {
-        //         await fetch("http://localhost:3001/api/scans",
-        //             {
-        //                 cache: "no-store",
-        //                 method: "GET",
-        //             });
-        //         updateOnline
-        //     } catch {
-        //         updateOffline
-        //     }
-        // };
-
         window.addEventListener('online', updateOnline);
         window.addEventListener('offline', updateOffline);
 

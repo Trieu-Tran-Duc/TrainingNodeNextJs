@@ -20,7 +20,7 @@ export default function ScanPage() {
     const [scanning, setScanning] = useState(false);
 
     const online = useNetworkStatus();
-    useOfflineSync();
+    useOfflineSync(online);
 
     const sendToServer = async (qr: QRData) => {
 
@@ -98,7 +98,20 @@ export default function ScanPage() {
 
     return (
         <div style={{ padding: "1rem" }}>
-            <button onClick={handleStartScan}>{scanning ? "Kết thúc scan" : "Bắt đầu scan"}</button>
+            <button
+                onClick={handleStartScan}
+                style={{
+                    padding: "6px 14px",
+                    fontSize: "14px",
+                    borderRadius: "4px",
+                    border: `1px solid ${scanning ? "#dc3545" : "#0d6efd"}`,
+                    color: scanning ? "#dc3545" : "#0d6efd",
+                    backgroundColor: "#fff",
+                    cursor: "pointer",
+                }}
+            >
+                {scanning ? "Kết thúc scan" : "Bắt đầu scan"}
+            </button>
 
             <p>Status: {status}</p>
             <p>
@@ -118,6 +131,7 @@ export default function ScanPage() {
                                 var qrText = extractTextFromResult(result)
                                 if (qrText) {
                                     handleScan(qrText);
+                                    setScanning(false)
                                 }
                             }
                         }}
@@ -140,5 +154,7 @@ export default function ScanPage() {
                 ))}
             </ul>
         </div>
+
     );
+
 }

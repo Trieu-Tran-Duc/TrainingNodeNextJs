@@ -1,8 +1,6 @@
 import { useEffect } from 'react';
-import { useNetworkStatus } from './useNetworkStatus';
 
-export function useOfflineSync() {
-  const online = useNetworkStatus();
+export function useOfflineSync(online: boolean) {
 
   useEffect(() => {
     if (online && 'serviceWorker' in navigator && 'SyncManager' in window) {

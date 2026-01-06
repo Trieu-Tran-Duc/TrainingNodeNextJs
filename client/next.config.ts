@@ -1,7 +1,6 @@
-import type { NextConfig } from "next";
 const runtimeCaching = [
   {
-    urlPattern: /^http?.*/,
+    urlPattern: /^https?.*/,
     handler: "NetworkFirst",
     options: {
       cacheName: "https-cache",
