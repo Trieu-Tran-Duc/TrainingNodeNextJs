@@ -4,5 +4,6 @@ const { ROLE_ENUM, METHOD_ENUM } = require("../utils/enumSystem");
 const tryCatch = require("../helper/tryCatch");
 
 baseRouter(METHOD_ENUM.POST, "/", tryCatch(scanController.scanQRCode), { }); 
+baseRouter(METHOD_ENUM.GET, "/", tryCatch(scanController.pingServer), { }); 
 
 module.exports = router;

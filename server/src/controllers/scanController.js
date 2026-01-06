@@ -3,7 +3,7 @@ const response = require("../helper/response");
 const scanQRCode = async (req, res) => {
     const scanData = req.body;
 
-    if (!scanData.id || !scanData.qrData) {
+    if (!scanData) {
         return response.error(res, 'Missing fields', 400);
     }
 
@@ -11,6 +11,11 @@ const scanQRCode = async (req, res) => {
     return response.success(res, { message: 'Scan saved', scan: scanData });
 }
 
+const pingServer = async (req, res) =>{
+    return response.success(res, { message: 'Server is alive' });
+}
+
 module.exports = {
-    scanQRCode
+    scanQRCode,
+    pingServer
 };
