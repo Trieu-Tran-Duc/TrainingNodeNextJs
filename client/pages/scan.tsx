@@ -110,7 +110,7 @@ export default function ScanPage() {
                     cursor: "pointer",
                 }}
             >
-                {scanning ? "Kết thúc scan" : "Bắt đầu scan"}
+                {scanning ? "SCAN COMPLETED" : "SCAN STARTED"}
             </button>
 
             <p>Status: {status}</p>
@@ -142,7 +142,7 @@ export default function ScanPage() {
                     />
                 </div>
             )}
-            <h2>Scanned QR Codes:</h2>
+            <h2>Scanned Barcode:</h2>
             <ul>
                 {scannedQRCodes.map((qr, idx) => (
                     <li key={idx}>
