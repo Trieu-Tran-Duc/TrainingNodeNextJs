@@ -34,7 +34,7 @@ const syncPendingQR = async () => {
 
     for (const qr of pending) {
         try {
-            const res = await fetch("http://localhost:3001/api/scans", {
+            const res = await fetch("/api/scans", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(qr),
