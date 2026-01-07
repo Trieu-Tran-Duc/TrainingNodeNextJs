@@ -6,10 +6,7 @@ const scanQRCode = async (req, res) => {
     if (!scanData) {
         return response.error(res, 'Missing fields', 400);
     }
-    scanData = {
-        ...scanData,
-        compate: true
-    };
+    scanData.completed = true;
 
     return response.success(res, { message: 'Scan saved', scan: scanData });
 }
