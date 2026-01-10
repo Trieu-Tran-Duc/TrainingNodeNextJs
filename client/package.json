@@ -9,6 +9,10 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mui/icons-material": "^7.3.7",
+    "@mui/material": "^7.3.7",
     "idb": "^8.0.3",
     "jsonwebtoken": "^9.0.3",
     "next": "16.1.1",
@@ -16,7 +20,8 @@
     "next-pwa": "^5.6.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-qr-barcode-scanner": "^2.1.20"
+    "react-qr-barcode-scanner": "^2.1.20",
+    "sass": "^1.97.2"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

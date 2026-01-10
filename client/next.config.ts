@@ -1,3 +1,5 @@
+const path = require('path');
+
 const runtimeCaching = [
   {
     urlPattern: /^https?.*/,
@@ -18,6 +20,14 @@ const withPWA = require("next-pwa")({
 
 const nextConfig = {
   reactStrictMode: true,
+  sassOptions: {
+    includePaths: [
+      path.join(__dirname, "styles"),
+    ],
+    // additionalData: `
+    //   @use "styles/abstracts/colors" as colors;
+    // `
+  },
   experimental: {
     turbo: false 
   }
